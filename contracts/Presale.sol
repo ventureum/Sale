@@ -107,11 +107,36 @@ contract Presale is Crowdsale, Ownable {
     function withdrawTokens() public {
         require(hasClosed());
         require(whitelist[msg.sender].whitelisted);
-        require(closingTime.add(whitelist[msg.sender].lockupDuration) >= now);
+        require(closingTime.add(whitelist[msg.sender].lockupDuration) < now);
         uint256 amount = balances[msg.sender];
         require(amount > 0);
         balances[msg.sender] = 0;
         _deliverTokens(msg.sender, amount);
+    }
+
+    function buyTokens(address _beneficiary) public payable {
+
+        uint256 weiAmount = msg.value;
+        _preValidatePurchase(_beneficiary, weiAmount);
+
+        // calculate token amount to be created
+        uint256 tokens = _getTokenAmount(_beneficiary, weiAmount);
+
+        // update state
+        weiRaised = weiRaised.add(weiAmount);
+
+        _processPurchase(_beneficiary, tokens);
+        emit TokenPurchase(
+                           msg.sender,
+                           _beneficiary,
+                           weiAmount,
+                           tokens
+                           );
+
+        _updatePurchasingState(_beneficiary, weiAmount);
+
+        _forwardFunds();
+        _postValidatePurchase(_beneficiary, weiAmount);
     }
 
     /**
@@ -119,10 +144,10 @@ contract Presale is Crowdsale, Ownable {
      * @param _weiAmount Value in wei to be converted into tokens
      * @return Number of tokens that can be purchased with the specified _weiAmount
      */
-    function _getTokenAmount(uint256 _weiAmount)
+    function _getTokenAmount(address _beneficiary, uint256 _weiAmount)
         internal view returns (uint256)
     {
-        return _weiAmount.mul(whitelist[msg.sender].rate);
+        return _weiAmount.mul(whitelist[_beneficiary].rate);
     }
 
     /**
