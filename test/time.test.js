@@ -15,7 +15,7 @@ const should = require('chai')
 const Crowdsale = artifacts.require('Presale');
 const SimpleToken = artifacts.require('Token');
 
-contract('Timed Crowdsale', function ([_, investor, wallet, purchaser]) {
+contract('Time', function ([_, investor, wallet, purchaser]) {
   const value = ether(42);
   const tokenSupply = new BigNumber('1e22');
 
@@ -52,6 +52,26 @@ contract('Timed Crowdsale', function ([_, investor, wallet, purchaser]) {
     it('should accept payments after start', async function () {
       await increaseTimeTo(this.openingTime);
       await this.crowdsale.buyTokens(investor, { value: value, from: purchaser }).should.be.fulfilled;
+    });
+
+    it('should reject payments after end', async function () {
+      await increaseTimeTo(this.afterClosingTime);
+      await this.crowdsale.buyTokens(investor, { value: value, from: purchaser }).should.be.rejectedWith(EVMRevert);
+    });
+  });
+
+  describe('use finalize', function () {
+    it('should accept payments after start', async function () {
+      await increaseTimeTo(this.openingTime);
+      await this.crowdsale.buyTokens(investor, { value: value, from: purchaser }).should.be.fulfilled;
+    });
+
+    it('should reject payments after finalize', async function () {
+      await this.crowdsale.finalize();
+      let _closingTime = latestTime(); 
+      await this.crowdsale.buyTokens(investor, { value: value, from: purchaser }).should.be.rejectedWith(EVMRevert);
+      let closingTime = await this.crowdsale.closingTime.call();
+      closingTime.should.be.bignumber.equal(new BigNumber(closingTime));
     });
 
     it('should reject payments after end', async function () {
