@@ -1,5 +1,7 @@
 pragma solidity ^0.4.23;
 
+import 'vetx-token/contracts/VetXToken.sol';
+
 contract Migrations {
   address public owner;
   uint public last_completed_migration;
