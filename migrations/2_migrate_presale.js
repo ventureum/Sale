@@ -5,11 +5,11 @@ var moment = require("moment")
 
 module.exports = async function (deployer, network, accounts) {
 
-  deployer.deploy(Token)
-  deployer.deploy(SafeMath)
-  deployer.link(SafeMath, Presale)
-  var start = moment().unix()
-  var end = moment().add(1, 'weeks').unix()
+  await deployer.deploy(SafeMath)
+  await deployer.link(SafeMath, [Presale, Token])
+  await deployer.deploy(Token)
+  var start = moment().add(1, 'weeks').unix()
+  var end = moment().add(2, 'weeks').unix()
   console.log("Token address: ", Token.address)
-  deployer.deploy(Presale, '0x35c0f041528BeD52f3349111F619Af402d654F37', Token.address, start, end)
+  await deployer.deploy(Presale, '0x35c0f041528BeD52f3349111F619Af402d654F37', Token.address, start, end)
 }
