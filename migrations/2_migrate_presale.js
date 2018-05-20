@@ -1,15 +1,16 @@
 var Presale = artifacts.require('./Presale.sol')
-var Token = artifacts.require('./Token.sol')
+var Token = artifacts.require('./VetXToken.sol')
 var SafeMath = artifacts.require('./SafeMath.sol')
 var moment = require("moment")
 
-module.exports = async function (deployer, network, accounts) {
-
-  await deployer.deploy(SafeMath)
-  await deployer.link(SafeMath, [Presale, Token])
-  await deployer.deploy(Token)
-  var start = moment().add(1, 'weeks').unix()
-  var end = moment().add(2, 'weeks').unix()
-  console.log("Token address: ", Token.address)
-  await deployer.deploy(Presale, '0x35c0f041528BeD52f3349111F619Af402d654F37', Token.address, start, end)
+module.exports = function (deployer, network, accounts) {
+  deployer.deploy(SafeMath).then(function() {
+    return deployer.link(SafeMath, [Presale, Token])
+  }).then(function() {
+    return deployer.deploy(Token, '1000000000000000000000000000', 'VetX', 18, 'VTX')
+  }).then(function() {
+    var start = moment().add(1, 'weeks').unix()
+    var end = moment().add(2, 'weeks').unix()
+    return deployer.deploy(Presale, '0xaa61EfbCECb656A4C95aa5bA602CEC547F91F1Cc', Token.address, start, end)
+  })
 }
