@@ -95,16 +95,19 @@ contract Presale is Crowdsale, Ownable {
         whitelist[_beneficiary].whitelisted = false;
     }
 
-    // Set the closingTime to now and close the sale
+    // Set the closingTime to block.timestamp and close the sale
     function finalize() external onlyOwner {
-        closingTime = now;
+
+        /* solium-disable-next-line security/no-block-members */
+        closingTime = block.timestamp;
+
         emit Finalized();
     }
 
-    // Set the closingTime to now and close the sale
+    // Set the closingTime to block.timestamp and close the sale
     function setOpeningAndClosingTime(uint256 _openingTime, uint256 _closingTime) external onlyOwner {
-      openingTime = _openingTime;
-      closingTime = _closingTime;
+        openingTime = _openingTime;
+        closingTime = _closingTime;
     }
 
     // transfer out tokens
@@ -119,7 +122,10 @@ contract Presale is Crowdsale, Ownable {
     function withdrawTokens() public {
         require(hasClosed());
         require(whitelist[msg.sender].whitelisted);
-        require(closingTime.add(whitelist[msg.sender].lockupDuration) < now);
+
+        /* solium-disable-next-line security/no-block-members */
+        require(closingTime.add(whitelist[msg.sender].lockupDuration) < block.timestamp);
+
         uint256 amount = balances[msg.sender];
         require(amount > 0);
         balances[msg.sender] = 0;
@@ -138,12 +144,13 @@ contract Presale is Crowdsale, Ownable {
         weiRaised = weiRaised.add(weiAmount);
 
         _processPurchase(_beneficiary, tokens);
-        emit TokenPurchase(
-                           msg.sender,
-                           _beneficiary,
-                           weiAmount,
-                           tokens
-                           );
+        emit TokenPurchase
+            (
+            msg.sender,
+            _beneficiary,
+            weiAmount,
+            tokens
+            );
 
         _updatePurchasingState(_beneficiary, weiAmount);
 
@@ -167,10 +174,11 @@ contract Presale is Crowdsale, Ownable {
      * @param _beneficiary Token purchaser
      * @param _tokenAmount Amount of tokens purchased
      */
-    function _processPurchase(
-                              address _beneficiary,
-                              uint256 _tokenAmount
-                              )
+    function _processPurchase
+       (
+        address _beneficiary,
+        uint256 _tokenAmount
+       )
         internal
     {
         balances[_beneficiary] = balances[_beneficiary].add(_tokenAmount);
@@ -182,10 +190,11 @@ contract Presale is Crowdsale, Ownable {
      * @param _beneficiary Token beneficiary
      * @param _weiAmount Amount of wei contributed
      */
-    function _preValidatePurchase(
-                                  address _beneficiary,
-                                  uint256 _weiAmount
-                                  )
+    function _preValidatePurchase
+       (
+        address _beneficiary,
+        uint256 _weiAmount
+       )
         internal
         isWhitelisted(_beneficiary)
         onlyWhileOpen()
