@@ -101,6 +101,12 @@ contract Presale is Crowdsale, Ownable {
         emit Finalized();
     }
 
+    // Set the closingTime to now and close the sale
+    function setOpeningAndClosingTime(uint256 _openingTime, uint256 _closingTime) external onlyOwner {
+      openingTime = _openingTime;
+      closingTime = _closingTime;
+    }
+
     /**
      * @dev Withdraw tokens only after crowdsale ends.
      */
