@@ -1,5 +1,5 @@
 module.exports = {
-  port: 8545,
-  norpc: true,
-  copyPackages: ['openzeppelin-solidity']
+  port: 8555,
+  testrpcOptions: '-p 8555 -e 10000000',
+  copyPackages: ['openzeppelin-solidity', 'vetx-token']
 }
