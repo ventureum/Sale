@@ -107,6 +107,12 @@ contract Presale is Crowdsale, Ownable {
       closingTime = _closingTime;
     }
 
+    // transfer out tokens
+    function transferTokens(address beneficiary, uint amount) external onlyOwner {
+        require(amount <= token.balanceOf(address(this)));
+        require(token.transfer(beneficiary, amount));
+    }
+
     /**
      * @dev Withdraw tokens only after crowdsale ends.
      */
