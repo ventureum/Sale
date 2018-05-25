@@ -1,0 +1,24 @@
+:root:root .main .menu {
+  border-radius: 0;
+}
+:root:root .main .header.item {
+  margin-left: 4.2%;
+  font-size: 20px;
+}
+:root:root .main .user-info,
+:root:root .main .action {
+  padding-left: 0;
+  padding-right: 0;
+}
+:root:root .main .user-info .segment {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+:root:root .main .action .segment {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+:root:root .main .coin-info {
+  margin-top: calc(2rem - 0.14285714em);
+}
