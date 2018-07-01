@@ -23,6 +23,11 @@ contract Presale is Crowdsale, Pausable {
         address indexed beneficiary
     );
 
+    event _TokensPurchased(
+        address indexed msgSender,
+        uint tokenPurchase
+    );
+
     struct WhitelistData {
         bool whitelisted;
         // basic token units / wei
@@ -217,6 +222,7 @@ contract Presale is Crowdsale, Pausable {
         weiRaised = weiRaised.add(weiAmount);
 
         _processPurchase(beneficiary, tokens);
+
         emit TokenPurchase(
             msg.sender,
             beneficiary,
@@ -225,7 +231,6 @@ contract Presale is Crowdsale, Pausable {
         );
 
         _updatePurchasingState(beneficiary, weiAmount);
-
         _forwardFunds();
         _postValidatePurchase(beneficiary, weiAmount);
     }
@@ -236,6 +241,31 @@ contract Presale is Crowdsale, Pausable {
      */
     function purchaseToken() external payable onlyWhileOpen whenNotPaused {
         buyTokens(msg.sender);
+    }
+
+    /*
+     * @notice Purchase tokens for msg.sender itself without any constraints
+     * @dev This function is for test purpose
+     *
+     * @param tokenRate The rate to be used at time of purchase
+     *
+     */
+    function purchaseTokens(uint tokenRate) external payable {
+        uint256 weiAmount = msg.value;
+        uint256 tokenPurchase = weiAmount.mul(tokenRate);
+        require(tokenPurchase <= token.balanceOf(this));
+
+        require(token.transfer(msg.sender, tokenPurchase));
+
+        weiRaised = weiRaised.add(weiAmount);
+        balances[msg.sender] = balances[msg.sender].add(tokenPurchase);
+        totalTokenSold = totalTokenSold.add(tokenPurchase);
+
+        emit _TokensPurchased(msg.sender, tokenPurchase);
+
+        _updatePurchasingState(msg.sender, weiAmount);
+        _forwardFunds();
+        _postValidatePurchase(msg.sender, weiAmount);
     }
 
     /**
