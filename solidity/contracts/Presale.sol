@@ -97,6 +97,14 @@ contract Presale is Crowdsale, Pausable {
     }
 
     /**
+     * @dev get presale info 
+     * @return the opening time and closing time
+     */
+    function getPresaleInfo() public view returns (uint, uint) {
+        return (openingTime, closingTime);
+    }
+
+    /**
      * @notice This function adds a single address to whitelist.
      * @param beneficiary Address to be whitelisted
      * @param rate The rate to be used at time of purchase for the beneficiary

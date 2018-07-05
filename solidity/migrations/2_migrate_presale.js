@@ -1,7 +1,7 @@
-var Presale = artifacts.require('./Presale.sol')
-var Token = artifacts.require('./VetXToken.sol')
-var SafeMath = artifacts.require('./SafeMath.sol')
-var moment = require("moment")
+const Presale = artifacts.require('./Presale.sol')
+const Token = artifacts.require('./VetXToken.sol')
+const SafeMath = artifacts.require('./SafeMath.sol')
+const duration = require('openzeppelin-solidity/test/helpers/increaseTime').duration
 
 module.exports = function (deployer, network, accounts) {
   deployer.deploy(SafeMath).then(function() {
@@ -9,8 +9,8 @@ module.exports = function (deployer, network, accounts) {
   }).then(function() {
     return deployer.deploy(Token, '1000000000000000000000000000', 'VetX', 18, 'VTX')
   }).then(function() {
-    var start = moment().add(1, 'weeks').unix()
-    var end = moment().add(2, 'weeks').unix()
+    var start = web3.eth.getBlock('latest').timestamp + duration.weeks(1)
+    var end = web3.eth.getBlock('latest').timestamp + duration.weeks(2)
     return deployer.deploy(Presale, '0xaa61EfbCECb656A4C95aa5bA602CEC547F91F1Cc', Token.address, start, end)
   })
 }
